@@ -15,14 +15,14 @@ def initiate_stk_push(request):
             amount = 1
             phone = "254721601159"
             process_request_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-            callback_url = 'https://kariukijames.com/pesa/callback.php'
+            callback_url = '#'#call back url
             passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
             business_short_code = '174379'
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
             party_a = phone
             party_b = '254708374149'
-            account_reference = 'UMESKIA SOFTWARES'
+            account_reference = 'FAMRICCO AGROVET'
             transaction_desc = 'stkpush test'
             stk_push_headers = {
                 'Content-Type': 'application/json',
