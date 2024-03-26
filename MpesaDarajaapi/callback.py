@@ -8,7 +8,10 @@ def process_stk_callback(request):
         json.dump(stk_callback_response, log)
     
     merchant_request_id = stk_callback_response['Body']['stkCallback']['MerchantRequestID']
+
+
     checkout_request_id = stk_callback_response['Body']['stkCallback']['CheckoutRequestID']
+    
     result_code = stk_callback_response['Body']['stkCallback']['ResultCode']
     result_desc = stk_callback_response['Body']['stkCallback']['ResultDesc']
     amount = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value']
@@ -16,4 +19,3 @@ def process_stk_callback(request):
     user_phone_number = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][4]['Value']
     
     if result_code == 0:
-        
