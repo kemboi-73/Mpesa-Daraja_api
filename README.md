@@ -43,8 +43,8 @@ To integrate M-PESA with your Django project, follow these steps:
 5. You can customize the STK push payload to suit your specific use case.
 
 ## Screenshots look
-![Visual Studio Logo](templates/stk request.jpg)
-(!(MpesaDarajaapi\templates\complete.jpg)) 
+
+![Screenshot_20240328_140229_One UI Home](https://github.com/kemboi-73/Mpesa-Daraja_api/assets/123319720/e5e34ad2-c81a-4d0d-ae96-3c46664311a4)
 
 
 ## Usage
