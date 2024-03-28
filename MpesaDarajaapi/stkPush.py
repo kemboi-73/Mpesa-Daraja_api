@@ -5,7 +5,7 @@ from datetime import datetime
 from django.http import JsonResponse
 from .acesstokener import find_acesstoken
 
-def initiate_stk_push(request):
+def start(request):
     access_token_response = find_acesstoken(request)  # Correct function call
     if isinstance(access_token_response, JsonResponse):
         access_token = access_token_response.content.decode('utf-8')
