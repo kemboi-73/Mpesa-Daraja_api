@@ -10,6 +10,7 @@ Integrate the power of M-PESA mobile payments into your Django project with ease
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+- [API Documentation](#API Documentation)
 
 ## Getting Started
 
@@ -41,11 +42,6 @@ To integrate M-PESA with your Django project, follow these steps:
 4. Update the `callback_url` to point to your actual callback URL where you want to receive transaction notifications.
 
 5. You can customize the STK push payload to suit your specific use case.
-
-## Screenshots look
-
-![Screenshot_20240328_140229_One UI Home](https://github.com/kemboi-73/Mpesa-Daraja_api/assets/123319720/e5e34ad2-c81a-4d0d-ae96-3c46664311a4)
-
 
 ## Usage
 
@@ -109,6 +105,7 @@ We welcome contributions to this project. If you'd like to contribute, please fo
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
+## API Documentation
+https://docs.google.com/document/d/1dHSotg5zTrMnIDYoJk99Z_xSewrqb1h-p4ZOML-Dqvs/edit?usp=sharing
 
-&copy; 2023 [Your Project Name]
+&copy; 2024 [Mpesa Daraja API]
