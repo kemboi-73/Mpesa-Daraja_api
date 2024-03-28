@@ -10,7 +10,7 @@ Integrate the power of M-PESA mobile payments into your Django project with ease
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-- [API Documentation](#API Documentation)
+- [API Documentation](#APIDocumentation)
 
 ## Getting Started
 
