@@ -22,5 +22,5 @@ def process_stk_callback(request):
         return JsonResponse({'message': 'Payment successful'})
     else:
         # Payment failed, handle accordingly
-        # For example, log the error, notify the user, retry the transaction, etc.
+        # notify the user, retry the transaction, etc.
         return JsonResponse({'error': 'Payment failed'})
