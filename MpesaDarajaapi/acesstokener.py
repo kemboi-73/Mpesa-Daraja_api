@@ -1,9 +1,9 @@
 import requests
 from django.http import JsonResponse
 
-def get_access_token(request):
+def find_acesstoken(request):
     consumer_key = "6LyDoxG9yJ9BTvRi0Cl9fKJRGoXFZNNx"  # Fill with your app Consumer Key
-    consumer_secret = "NdXlNAEiFZWcYAjb"  # Fill with your app Consumer Secret
+    consumer_secret = "NdXlNAEiFZWcYAjb"  # app Consumer Secret
     access_token_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
     headers = {'Content-Type': 'application/json'}
     auth = (consumer_key, consumer_secret)

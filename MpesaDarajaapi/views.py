@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from .main import main
-from .generateAcesstoken import get_access_token
+from .acesstokener import find_acesstoken
 from .stkPush import initiate_stk_push
 from .query import query_stk_status
 

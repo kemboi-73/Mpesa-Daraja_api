@@ -3,10 +3,10 @@ import json
 import base64
 from datetime import datetime
 from django.http import JsonResponse
-from .generateAcesstoken import get_access_token
+from .acesstokener import find_acesstoken
 
 def query_stk_status(request):
-    access_token_response = get_access_token(request)
+    access_token_response = find_acesstoken(request)
     if isinstance(access_token_response, JsonResponse):
         access_token = access_token_response.content.decode('utf-8')
         access_token_json = json.loads(access_token)

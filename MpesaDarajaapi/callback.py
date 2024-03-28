@@ -19,3 +19,8 @@ def process_stk_callback(request):
     user_phone_number = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][4]['Value']
     
     if result_code == 0:
+        return JsonResponse({'message': 'Payment successful'})
+    else:
+        # Payment failed, handle accordingly
+        # For example, log the error, notify the user, retry the transaction, etc.
+        return JsonResponse({'error': 'Payment failed'})
