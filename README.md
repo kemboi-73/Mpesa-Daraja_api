@@ -44,7 +44,7 @@ To integrate M-PESA with your Django project, follow these steps:
 
 ## Screenshots look
 ![Visual Studio Logo](templates/stk request.jpg)
-![Visual Studio Logo](MpesaDarajaapi\templates\complete.jpg)
+(![Alt text](MpesaDarajaapi\templates\complete.jpg)) 
 
 
 ## Usage
