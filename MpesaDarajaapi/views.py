@@ -5,4 +5,4 @@ from django.shortcuts import render
 from .main import main
 from .acesstokener import find_acesstoken
 from .stkPush import start
-from .query import query_stk_status
+from .query import run_query
