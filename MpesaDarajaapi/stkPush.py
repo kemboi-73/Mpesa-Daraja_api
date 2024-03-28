@@ -3,20 +3,20 @@ import json
 import base64
 from datetime import datetime
 from django.http import JsonResponse
-from .acesstoken import access_token
+from .generateAcesstoken import get_access_token
 
-def start_stk(request):
-    access_token_response = get_access_token(request)
+def initiate_stk_push(request):
+    access_token_response = get_access_token(request)  # Correct function call
     if isinstance(access_token_response, JsonResponse):
         access_token = access_token_response.content.decode('utf-8')
         access_token_json = json.loads(access_token)
         access_token = access_token_json.get('access_token')
         if access_token:
-            # neccesary credatials to be replaced with post once front end is done
+            # Necessary credentials to be replaced with post once the front end is done
             amount = 1
-            phone = "254721601159"
+            phone = "254717839550"
             process_request_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-            callback_url = 'https://370c-41-90-65-167.ngrok-free.app/callback' # Call back URL
+            callback_url = 'https://f620-41-90-69-113.ngrok-free.app/Mpesa-Daraja_api/MpesaDarajaapi/callback.py'  # Callback URL
             passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
             business_short_code = '174379'
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
