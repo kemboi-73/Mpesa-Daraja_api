@@ -42,6 +42,11 @@ To integrate M-PESA with your Django project, follow these steps:
 
 5. You can customize the STK push payload to suit your specific use case.
 
+## Screenshots look
+![Visual Studio Logo](templates/stk request.jpg)
+![Visual Studio Logo](MpesaDarajaapi\templates\complete.jpg)
+
+
 ## Usage
 
 The integration provides a Django view function named `initiate_stk_push` that you can use to initiate an STK push transaction. You can invoke this view in your Django application, and it will initiate the M-PESA transaction for you.
@@ -84,6 +89,7 @@ Integrating M-PESA payments into your system offers a wide range of benefits, ma
 12. **Fintech Innovation**: Integrating M-PESA aligns your system with the latest fintech trends and innovations. It showcases your commitment to embracing modern payment technologies.
 
 In summary, integrating M-PESA payments into your system can enhance user convenience, expand your customer base, and improve the efficiency and security of financial transactions. It is a strategic move that aligns with the increasing trend toward digital and mobile payments.
+
 
 ## Contributing
 
