@@ -45,11 +45,11 @@ To integrate M-PESA with your Django project, follow these steps:
 
 ## Usage
 
-The integration provides a Django view function named `initiate_stk_push` that you can use to initiate an STK push transaction. You can invoke this view in your Django application, and it will initiate the M-PESA transaction for you.
+The integration provides a Django view function named `start` that you can use to initiate an STK push transaction. You can invoke this view in your Django application, and it will initiate the M-PESA transaction for you.
 
 Here's a brief overview of the code:
 
-- It obtains an access token from M-PESA using the `get_access_token` function.
+- It obtains an access token from M-PESA using the `find_access_token` function.
 - It assembles the STK push payload with relevant details such as business short code, password, timestamp, etc.
 - It sends the STK push request to M-PESA using the `requests` library.
 - It handles the response and provides feedback accordingly.
