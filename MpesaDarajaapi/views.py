@@ -14,3 +14,7 @@ from .query import run_query
 # def payment_list(request):
 #     payments = Payment.objects.all()
 #     return render(request, 'payment_list.html', {'payments': payments})
+from django.shortcuts import render
+
+def stk_form_view(request):
+    return render(request, 'stkform.html')

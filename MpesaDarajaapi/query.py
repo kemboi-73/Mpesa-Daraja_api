@@ -4,8 +4,14 @@ import base64
 from datetime import datetime
 from django.http import JsonResponse
 from .acesstokener import find_acesstoken
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def run_query(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        checkout_request_id = data.get('CheckoutRequestID')
+
     access_token_response = find_acesstoken(request)
     if isinstance(access_token_response, JsonResponse):
         access_token = access_token_response.content.decode('utf-8')
@@ -17,7 +23,7 @@ def run_query(request):
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
             password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
-            checkout_request_id = 'ws_CO_03072023054410314768168060'
+            # checkout_request_id = 'ws_CO_03072023054410314768168060'
 
             query_headers = {
                 'Content-Type': 'application/json',
