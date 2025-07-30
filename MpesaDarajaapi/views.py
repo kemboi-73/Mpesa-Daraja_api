@@ -40,3 +40,19 @@ def mpesa_callback(request):
 def transaction_list(request):
     transactions = Payment.objects.all().order_by('-timestamp')
     return render(request, 'transactions.html', {'transactions': transactions})
+
+from django.http import JsonResponse
+from .models import Payment
+
+def get_latest_payment(request):
+    latest = Payment.objects.last()
+    if latest:
+        return JsonResponse({
+            'transaction_id': latest.transaction_id or "N/A",
+            'amount': latest.amount or "N/A",
+            'phone': latest.user_phone_number or "N/A",
+            'result_desc': latest.result_desc or "N/A",
+            'result_code': latest.result_code
+        })
+    else:
+        return JsonResponse({'error': 'No payment found'}, status=404)
