@@ -1,7 +1,8 @@
 import json
 from django.http import JsonResponse
 from MpesaDarajaapi.models import Payment  # Make sure this import is correct
-
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
 def process_stk_callback(request):
     stk_callback_response = json.loads(request.body)
 
