@@ -175,7 +175,7 @@ function initiatePayment(event) {
           } else if (query.message) {
             showStatus("❌ " + query.message, "error");
           } else {
-            showStatus("⚠️ Unknown response received", "error");
+            showStatus("⚠️ Undefined error", "error");
           }
         });
       }, 10000);
