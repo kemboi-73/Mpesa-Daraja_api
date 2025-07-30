@@ -23,8 +23,6 @@ def run_query(request):
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
             password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
-            # checkout_request_id = 'ws_CO_03072023054410314768168060'
-
             query_headers = {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + access_token

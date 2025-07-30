@@ -5,28 +5,28 @@ from datetime import datetime
 from django.http import JsonResponse
 from .acesstokener import find_acesstoken
 from django.views.decorators.csrf import csrf_exempt
-
+from django.conf import settings
 @csrf_exempt
 def start(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         phone = data.get('phone')
         amount = data.get('amount', 1)
-    access_token_response = find_acesstoken(request)  # Correct function call
+    access_token_response = find_acesstoken(request)  # function call
     if isinstance(access_token_response, JsonResponse):
         access_token = access_token_response.content.decode('utf-8')
         access_token_json = json.loads(access_token)
         access_token = access_token_json.get('access_token')
         if access_token:
             process_request_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-            callback_url = 'https://mpesa-i42i.onrender.com/api/v1/stk/callback/'
-            passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
-            business_short_code = '174379'
+            callback_url = settings.CALLBACK_URL
+            passkey = settings.PASSKEY
+            business_short_code = settings.SHORTCODE
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
             party_a = phone
             party_b = '254708374149'
-            account_reference = 'ALX AFRICA PROJECT TEST'
+            account_reference = 'Mikes-MPESA DARAJA TEST'
             transaction_desc = 'stkpush test'
             stk_push_headers = {
                 'Content-Type': 'application/json',
