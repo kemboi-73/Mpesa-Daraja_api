@@ -119,78 +119,105 @@
         font-size: 16px;
       }
     }
+    #status {
+  display: none !important;
+}
   </style>
-  <script>
-    function showStatus(message, type) {
-      const status = document.getElementById("status");
-      status.innerText = message;
-      status.className = "";
-      status.style.display = "block";
-      if (type === "success") {
-        status.classList.add("success");
-      } else {
-        status.classList.add("error");
-      }
-    }
-
-    function showSpinner(show) {
-  const spinner = document.getElementById("spinner");
-  spinner.style.display = show ? "block" : "none";
-}
-
-function initiatePayment(event) {
-  event.preventDefault();
-  const phone = document.getElementById("phone").value;
-  const amount = document.getElementById("amount").value;
-
-  showStatus("Initiating payment...", "success");
-  showSpinner(true); // Show spinner
-
-  fetch("/stk/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ phone, amount })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.CheckoutRequestID) {
-      showStatus("Payment initiated. Waiting for confirmation...", "success");
-
-      setTimeout(() => {
-        fetch("/results/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ CheckoutRequestID: data.CheckoutRequestID })
-        })
-        .then(res => res.json())
-        .then(query => {
-          showSpinner(false); // Hide spinner
-
-          if (query.message && query.message.startsWith("0")) {
-            showStatus("✅ Payment Successful!", "success");
-          } else if (query.message) {
-            showStatus("❌ " + query.message, "error");
-          } else {
-            showStatus("⚠️ Undefined error", "error");
-          }
-        });
-      }, 10000);
+<script>
+  function showStatus(message, type) {
+    const status = document.getElementById("status");
+    status.innerText = message;
+    status.className = "";
+    status.style.display = "block";
+    if (type === "success") {
+      status.classList.add("success");
     } else {
-      showSpinner(false); // Hide spinner
-      showStatus("❌ " + (data.error || "Failed to initiate payment."), "error");
+      status.classList.add("error");
     }
-  })
-  .catch(err => {
-    showSpinner(false); // Hide spinner
-    showStatus("❌ Network error: " + err.message, "error");
-  });
-}
+  }
 
-  </script>
+  function showSpinner(show) {
+    const spinner = document.getElementById("spinner");
+    spinner.style.display = show ? "block" : "none";
+  }
+
+  function showModal(title, message) {
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalMessage").innerHTML = message;
+    document.getElementById("paymentModal").style.display = "block";
+  }
+
+  function closeModal() {
+    document.getElementById("paymentModal").style.display = "none";
+  }
+
+  function initiatePayment(event) {
+    event.preventDefault();
+    let phone = document.getElementById("phone").value;
+    const amount = document.getElementById("amount").value;
+
+    // Normalize 07... to 2547...
+    phone = phone.replace(/\s+/g, "");
+    if (phone.startsWith("07")) {
+      phone = "254" + phone.substring(1);
+    }
+
+    showStatus("Initiating payment...", "success");
+    showSpinner(true);
+
+    fetch("/stk/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ phone, amount })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.CheckoutRequestID) {
+        showStatus("Payment initiated. Waiting for confirmation...", "success");
+
+        setTimeout(() => {
+          fetch("/results/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ CheckoutRequestID: data.CheckoutRequestID })
+          })
+          .then(res => res.json())
+          .then(query => {
+            showSpinner(false);
+            if (query.message && query.message.startsWith("0")) {
+              const trxId = query.transaction_id || "N/A";
+              const desc = query.result_desc || "Payment successful.";
+              showStatus("✅ Payment Successful!", "success");
+              showModal("✅ Payment Successful", `
+                <p><strong>Transaction ID:</strong> ${trxId}</p>
+                <p><strong>Status:</strong> ${desc}</p>
+              `);
+            } else {
+              const errorMsg = query.result_desc || query.message || "Unknown error occurred.";
+              showStatus("❌ " + errorMsg, "error");
+              showModal("❌ Payment Failed", `<p>${errorMsg}</p>`);
+            }
+          });
+        }, 10000);
+      } else {
+        showSpinner(false);
+        const errorMsg = data.error || "Failed to initiate payment.";
+        showStatus("❌ " + errorMsg, "error");
+        showModal("❌ Payment Failed", `<p>${errorMsg}</p>`);
+      }
+    })
+    .catch(err => {
+      showSpinner(false);
+      showStatus("❌ Network error: " + err.message, "error");
+      showModal("❌ Network Error", `<p>${err.message}</p>`);
+    });
+  }
+</script>
+
 </head>
 <body>
   <div class="container">
@@ -210,7 +237,53 @@ function initiatePayment(event) {
         * This is a <strong>test environment</strong>. All transactions will be <strong>auto-reversed</strong> shortly by mpesa.
       </p>
     </form>
-    
+    <!-- Modal -->
+<div id="paymentModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalMessage"></p>
+  </div>
+</div>
+
+<style>
+  /* Modal Styling */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: #000;
+  }
+</style>
+
 
     <div id="status"></div>
     <div id="spinner" style="display: none; text-align: center; margin-top: 20px;">
