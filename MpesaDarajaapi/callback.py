@@ -49,7 +49,13 @@ def process_stk_callback(request):
                 transaction_id=transaction_id,
                 user_phone_number=user_phone_number
             )
-            return JsonResponse({"message": "Payment saved successfully"})
+            return JsonResponse({
+                "message": "Payment saved successfully",
+                "transaction_id": transaction_id,
+                "amount": amount,
+                "phone": user_phone_number,
+                "result_desc": result_desc
+            })
 
         # If payment failed
         Payment.objects.create(
@@ -58,7 +64,11 @@ def process_stk_callback(request):
             result_code=result_code,
             result_desc=result_desc
         )
-        return JsonResponse({"error": "Payment failed"})
+        return JsonResponse({
+            "message": "Payment failed",
+            "result_code": result_code,
+            "result_desc": result_desc
+        })
 
     except json.JSONDecodeError:
         return HttpResponseBadRequest("Invalid JSON format")

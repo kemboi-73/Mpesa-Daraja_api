@@ -2,10 +2,11 @@ import requests
 from django.http import JsonResponse
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
-
+import os
 def find_acesstoken(request):
-    consumer_key = settings.CONSUMER_KEY
-    consumer_secret = settings.CONSUMER_SECRET
+    consumer_key = os.environ.get("CONSUMER_KEY")
+    consumer_secret = os.environ.get("CONSUMER_SECRET")
+
     access_token_url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
 
     try:

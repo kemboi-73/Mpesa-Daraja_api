@@ -1,15 +1,22 @@
 from pathlib import Path
-import os
 from decouple import config
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
+CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+PASSKEY = os.environ.get("PASSKEY")
+CALLBACK_URL = os.environ.get("CALLBACK_URL")
+BUSINESS_SHORT_CODE = os.environ.get("BUSINESS_SHORT_CODE")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-7ar)$h-6v3a*f3&r(4ygi*^bnvi)p%l^+j4t_+@y9p)iec!em-'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

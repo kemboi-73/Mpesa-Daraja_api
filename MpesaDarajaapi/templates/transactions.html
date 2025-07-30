@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STK Push Transactions</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .failed {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>STK Push Transactions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Phone Number</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>M-PESA Receipt</th>
+                <th>Description</th>
+                <th>Checkout Request ID</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.user_phone_number|default:"—" }}</td>
+                <td>{{ transaction.amount|default:"—" }}</td>
+                <td>
+                    {% if transaction.result_code == 0 %}
+                        <span class="success">Success</span>
+                    {% else %}
+                        <span class="failed">Failed</span>
+                    {% endif %}
+                </td>
+                <td>{{ transaction.transaction_id|default:"—" }}</td>
+                <td>{{ transaction.result_desc }}</td>
+                <td>{{ transaction.checkout_request_id }}</td>
+                <td>{{ transaction.created_at|date:"F j, Y, g:i a" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
