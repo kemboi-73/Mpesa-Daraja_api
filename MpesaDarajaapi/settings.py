@@ -21,7 +21,7 @@ SECRET_KEY = 'django-insecure-7ar)$h-6v3a*f3&r(4ygi*^bnvi)p%l^+j4t_+@y9p)iec!em-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mpesa-i42i.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mpesa-i42i.onrender.com', 'mpesa.kemboi.dev', 'localhost', '127.0.0.1']
 
 
 
