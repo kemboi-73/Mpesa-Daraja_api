@@ -3,6 +3,8 @@ from .main import main
 from .acesstokener import find_acesstoken
 from .stkPush import start
 from .query import run_query
+from .models import Transaction
+from .models import Payment
 
 def stk_form_view(request):
     return render(request, 'stkform.html')
@@ -34,9 +36,7 @@ def mpesa_callback(request):
 
     return JsonResponse({"status": "ok"})
 
-from django.shortcuts import render
-from .models import Transaction
 
 def transaction_list(request):
-    transactions = Transaction.objects.all().order_by('-created_at')
+    transactions = Payment.objects.all().order_by('-timestamp')
     return render(request, 'transactions.html', {'transactions': transactions})
