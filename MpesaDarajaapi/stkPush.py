@@ -19,7 +19,7 @@ def start(request):
         access_token = access_token_json.get('access_token')
         if access_token:
             process_request_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-            callback_url = 'https://mpesa-i42i.onrender.com/api/callback/'
+            callback_url = 'https://mpesa-i42i.onrender.com/api/v1/stk/callback/'
             passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
             business_short_code = '174379'
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
