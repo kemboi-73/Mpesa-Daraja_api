@@ -12,5 +12,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),  
     # path('payments/', payment_list, name='payment_list'), #redirect the list to the template you want
     path('', stk_form_view, name='stk_form'),
+    path('payment-success/', views.latest_payment, name='payment-success'),
     
 ]

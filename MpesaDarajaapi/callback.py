@@ -1,36 +1,46 @@
 import json
 from django.http import JsonResponse
+from MpesaDarajaapi.models import Payment  # Make sure this import is correct
 
-
-# Processses a callback url that is sent to the one who has a callback url 
 def process_stk_callback(request):
     stk_callback_response = json.loads(request.body)
 
-    # returns the response as a json format
+    # Save response to a log file (optional)
     log_file = "Mpesastkresponse.json"
     with open(log_file, "a") as log:
         json.dump(stk_callback_response, log)
 
-    #Names of the data in the order of how it will show up on a callback url
-    
+    # Extract necessary data
     merchant_request_id = stk_callback_response['Body']['stkCallback']['MerchantRequestID']
-
     checkout_request_id = stk_callback_response['Body']['stkCallback']['CheckoutRequestID']
-    
     result_code = stk_callback_response['Body']['stkCallback']['ResultCode']
     result_desc = stk_callback_response['Body']['stkCallback']['ResultDesc']
-    amount = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value']
-    transaction_id = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][1]['Value']
-    user_phone_number = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item'][4]['Value']
 
-    # Error code handling based on the errors mentoned in query and stkPush file
-    
+    # Some callbacks may not contain CallbackMetadata if failed
     if result_code == 0:
-        return JsonResponse({'message': 'Payment successful'})
+        items = stk_callback_response['Body']['stkCallback']['CallbackMetadata']['Item']
+        amount = items[0]['Value']
+        transaction_id = items[1]['Value']
+        user_phone_number = items[4]['Value']
+
+        # ✅ Save to database
+        Payment.objects.create(
+            merchant_request_id=merchant_request_id,
+            checkout_request_id=checkout_request_id,
+            result_code=result_code,
+            result_desc=result_desc,
+            amount=amount,
+            transaction_id=transaction_id,
+            user_phone_number=user_phone_number
+        )
+
+        return JsonResponse({'message': 'Payment saved successfully'})
     else:
-        # Payment failed, handle accordingly
-        
-        # notify the user, retry the transaction, etc eg user canceled the stk request.
+        # You can still save the failed attempt if needed
+        Payment.objects.create(
+            merchant_request_id=merchant_request_id,
+            checkout_request_id=checkout_request_id,
+            result_code=result_code,
+            result_desc=result_desc,
+        )
         return JsonResponse({'error': 'Payment failed'})
-        
-    # Code can be adedd to save the data into the database

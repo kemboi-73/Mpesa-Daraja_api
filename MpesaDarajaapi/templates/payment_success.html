@@ -1,0 +1,17 @@
+<!-- templates/payment_success.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Successful</title>
+</head>
+<body>
+    <h1>Payment Successful!</h1>
+    <ul>
+        <li>Amount: {{ payment.amount }}</li>
+        <li>Transaction ID: {{ payment.transaction_id }}</li>
+        <li>Phone Number: {{ payment.user_phone_number }}</li>
+        <li>Date: {{ payment.timestamp }}</li>
+        <li>Description: {{ payment.result_desc }}</li>
+    </ul>
+</body>
+</html>
