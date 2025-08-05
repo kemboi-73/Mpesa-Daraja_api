@@ -26,7 +26,9 @@
         <td>{{ tx.transaction_id|default:"-" }}</td>
         <td>{{ tx.result_desc|default:"-" }}</td>
         <td>{{ tx.checkout_request_id|default:"-" }}</td>
-        <td>{{ tx.timestamp|date:"F j, Y, g:i a" }}</td>
+        <td>{{ tx.created_at|date:"F j, Y, g:i a" }}</td>
+
+      
 >
       </tr>
     {% empty %}
