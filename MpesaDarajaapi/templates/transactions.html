@@ -1,38 +1,77 @@
-<h2>STK Push Transactions</h2>
-<table border="1" cellpadding="6">
-  <thead>
-    <tr>
-      <th>Phone Number</th>
-      <th>Amount (KES)</th>
-      <th>Status</th>
-      <th>Transaction ID</th>
-      <th>Message</th>
-      <th>Checkout Request ID</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for tx in transactions %}
-      <tr>
-        <td>{{ tx.user_phone_number }}</td>
-        <td>{{ tx.amount }}</td>
-        <td>
-          {% if tx.result_code == 0 %}
-            ✅ Success
-          {% else %}
-            ❌ Failed
-          {% endif %}
-        </td>
-        <td>{{ tx.transaction_id|default:"-" }}</td>
-        <td>{{ tx.result_desc|default:"-" }}</td>
-        <td>{{ tx.checkout_request_id|default:"-" }}</td>
-        <td>{{ tx.created_at|date:"F j, Y, g:i a" }}</td>
+{% load static %}
 
-      
->
-      </tr>
-    {% empty %}
-      <tr><td colspan="7">No transactions found.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://kit.fontawesome.com/fff031d665.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'banner.svg' %}">
+  <title>STK Push Transactions</title>
+</head>
+<body>
+  <main>
+  <div class="transactions-container my-4">
+    <h2 class="mb-4 text-center">STK Push Transactions</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped align-middle text-center shadow-sm">
+            <thead>
+                <tr>
+                    <th>Phone Number</th>
+                    <th>Amount (KES)</th>
+                    <th>Status</th>
+                    <th>Transaction ID</th>
+                    <th>Message</th>
+                    <th>Checkout Request ID</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td>{{ tx.user_phone_number }}</td>
+                    <td>{{ tx.amount }}</td>
+                    <td>
+                        {% if tx.result_code == 0 %}
+                            <span class="badge bg-success">✅ Success</span>
+                        {% else %}
+                            <span class="badge bg-danger">❌ Failed</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ tx.transaction_id|default:"-" }}</td>
+                    <td>{{ tx.result_desc|default:"-" }}</td>
+                    <td>{{ tx.checkout_request_id|default:"-" }}</td>
+                    <td>{{ tx.created_at|date:"F j, Y, g:i a" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-muted">No transactions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+</main>
+  <footer class="simple-footer">
+    <div class="footer-left">
+      © 2025 <a href="https://kemboi.dev" class="kemboi-link">Kemboi</a>. 
+      <span class="docs-note">Documentation coming soon</span>.
+    </div>
+    
+  
+    <div class="footer-right">
+      <a href="https://x.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-x-twitter"></i></a>
+      <a href="https://github.com/kemboi-73" class="footer-icon"><i class="fa-brands fa-square-github"></i></a>
+      <a href="https://www.linkedin.com/in/kemboimikey" class="footer-icon"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://www.instagram.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-instagram"></i></a>
+      <a href="https://api.whatsapp.com/send?phone=+254721601159" class="footer-icon"><i class="fa-brands fa-square-whatsapp"></i></a>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -4,176 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://kit.fontawesome.com/fff031d665.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'banner.svg' %}">
+
   <title>MPESA STK Push Payment</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      margin: auto;
-      margin-top: 50px;
-      width: 90%;
-    }
-    h2 { text-align: center; color: #2c3e50; }
-    .logo { display: flex; justify-content: center; margin-bottom: 20px; }
-    .logo img { max-width: 200px; width: 100%; height: auto; }
-    label { font-weight: bold; }
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 10px; margin: 10px 0 20px 0;
-      border: 1px solid #ccc; border-radius: 5px;
-    }
-    input[type="submit"] {
-      width: 100%; padding: 10px;
-      background: #27ae60; color: white; border: none;
-      border-radius: 5px; font-weight: bold; cursor: pointer;
-    }
-    input[type="submit"]:hover { background: #219150; }
-    #status { display: none; margin-top: 20px; padding: 10px; border-radius: 5px; font-weight: bold; }
-    #status.success { background: #e0f8e9; color: #2c662d; border: 1px solid #27ae60; }
-    #status.error { background: #ffe5e5; color: #a94442; border: 1px solid #e74c3c; }
-    footer { text-align: center; margin-top: auto; padding: 20px 10px; background-color: #2c3e50; color: white; font-size: 14px; }
-    @media (max-width: 480px) { .container { margin-top: 30px; padding: 20px; } .logo img { max-width: 150px; } input[type="submit"] { font-size: 16px; } }
-    
-    /* Modal styling */
-    .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-    .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-align: center; }
-    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-    .close:hover { color: #000; }
-  </style>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const status = document.getElementById("status");
-      const spinner = document.getElementById("spinner");
-      const modal = document.getElementById("paymentModal");
-      const modalTitle = document.getElementById("modalTitle");
-      const modalMessage = document.getElementById("modalMessage");
-      const modalGif = document.getElementById("modalGif");
-
-      const successGif = modal.getAttribute("data-success-url");
-      const failedGif = modal.getAttribute("data-failed-url");
-
-      function showStatus(message, type) {
-        status.textContent = message;
-        status.className = type;
-        status.style.display = "block";
-      }
-      function showSpinner(show) { spinner.style.display = show ? "block" : "none"; }
-      function showModal(title, htmlContent, isSuccess) {
-        modalTitle.textContent = title;
-        modalGif.src = (isSuccess ? successGif : failedGif) + "?t=" + Date.now();
-        modalMessage.innerHTML = htmlContent;
-        modal.style.display = "block";
-      }
-      window.closeModal = () => modal.style.display = "none";
-
-      function pollPayment(checkoutID, phone, amount) {
-        let attempts = 0;
-        const interval = setInterval(() => {
-          fetch("/results/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ CheckoutRequestID: checkoutID }),
-          })
-            .then(res => res.json())
-            .then(result => {
-              const resultCode = (result.ResultCode || result.result_code)?.toString();
-              const txn = result.transaction_details || {};
-              attempts++;
-
-              if (resultCode === "0") {
-                clearInterval(interval);
-                showSpinner(false);
-                showStatus("Payment Successful!", "success");
-                showModal("Payment Successful", `
-                  <p><strong>Transaction ID:</strong> ${txn.TransactionID || "N/A"}</p>
-                  <p><strong>Amount:</strong> KES ${txn.Amount || amount}</p>
-                  <p><strong>Phone:</strong> ${txn.PhoneNumber || phone}</p>
-                  <p><strong>Date:</strong> ${txn.TransactionDate || "N/A"}</p>
-                `, true);
-              } else if (attempts >= 6) { // stop after ~30s
-                clearInterval(interval);
-                showSpinner(false);
-                const msg = result.ResultDesc || result.result_desc || "Payment failed or was cancelled.";
-                showStatus(msg, "error");
-                showModal("Payment Failed", `<p>${msg}</p>`, false);
-              }
-            })
-            .catch(err => {
-              clearInterval(interval);
-              showSpinner(false);
-              showStatus("Error: " + err.message, "error");
-              showModal("Error", `<p>${err.message}</p>`, false);
-            });
-        }, 5000); // poll every 5s
-      }
-
-      window.initiatePayment = function (event) {
-        event.preventDefault();
-        let phone = document.getElementById("phone").value.trim();
-        const amount = document.getElementById("amount").value;
-
-        if (!phone || !amount) {
-          showStatus("Please fill in both phone and amount.", "error");
-          return;
-        }
-        if (phone.startsWith("07")) phone = "254" + phone.slice(1);
-
-        showStatus("Initiating payment...", "success");
-        showSpinner(true);
-
-        fetch("/stk/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, amount }),
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.CheckoutRequestID) {
-              showStatus("Waiting for confirmation...", "success");
-              pollPayment(data.CheckoutRequestID, phone, amount);
-            } else {
-              showSpinner(false);
-              const msg = data.error || "Failed to initiate payment.";
-              showStatus(msg, "error");
-              showModal("Payment Failed", `<p>${msg}</p>`, false);
-            }
-          })
-          .catch(err => {
-            showSpinner(false);
-            showStatus("Network error: " + err.message, "error");
-            showModal("Network Error", `<p>${err.message}</p>`, false);
-          });
-      };
-    });
-  </script>
 </head>
 <body>
+  <main>
   <div class="container">
     <div class="logo">
       <img src="{% static 'lipa na mpesa.png' %}" alt="Lipa na Mpesa">
     </div>
 
     <form onsubmit="initiatePayment(event)">
-      <label for="phone">Phone Number (format-2547xxxxxxxx)</label>
+      <label for="phone">Phone Number</label>
       <input type="text" id="phone" name="phone" placeholder="e.g. 254712345678" required>
+
       <label for="amount">Amount (KES)</label>
       <input type="number" id="amount" name="amount" min="1" required>
+
       <input type="submit" value="Pay Now">
+
       <p style="color: rgb(104, 6, 223); font-size: 0.9em; margin-top: 10px;">
-        * This is a <strong>test environment</strong>. All transactions will be <strong>auto-reversed</strong> shortly by M-PESA.
+        * This is a <strong>test environment</strong>. All transactions will be 
+        <strong>auto-reversed</strong> shortly by M-PESA.
       </p>
     </form>
 
@@ -186,6 +41,11 @@
         <img id="modalGif" src="" alt="Status Animation" style="width: 80px; margin-bottom: 10px;">
         <h2 id="modalTitle"></h2>
         <p id="modalMessage"></p>
+        <button id="doneBtn" 
+        style="margin-top: 15px; padding: 10px 20px; background: #28a745; 
+               color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Done
+        </button>
       </div>
     </div>
 
@@ -194,7 +54,22 @@
       <img src="{% static 'spinner.svg' %}" alt="Loading..." style="width: 50px;">
     </div>
   </div>
+  
+</main>
+<footer class="simple-footer">
+  <div class="footer-left">
+    © 2025 <a href="https://kemboi.dev" class="kemboi-link">Kemboi</a>. 
+    <span class="docs-note">Documentation coming soon</span>.
+  </div>
 
-  <footer>-by <a target="_blank" href="https://kemboi.dev">Kemboi</a></footer>
+  <div class="footer-right">
+    <a href="https://x.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-x-twitter"></i></a>
+    <a href="https://github.com/kemboi-73" class="footer-icon"><i class="fa-brands fa-square-github"></i></a>
+    <a href="https://www.linkedin.com/in/kemboimikey" class="footer-icon"><i class="fa-brands fa-linkedin"></i></a>
+    <a href="https://www.instagram.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-instagram"></i></a>
+    <a href="https://api.whatsapp.com/send?phone=+254721601159" class="footer-icon"><i class="fa-brands fa-square-whatsapp"></i></a>
+  </div>
+</footer>
+  <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
