@@ -6,10 +6,7 @@ import requests
 import json
 import base64
 import os
-import logging
 from datetime import datetime
-
-logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def run_query(request):
@@ -23,31 +20,14 @@ def run_query(request):
         if not checkout_request_id:
             return JsonResponse({'status': 'error', 'message': 'CheckoutRequestID is required.'}, status=400)
 
-        # Try DB first
+        # 🔹 Try getting payment from DB first
         try:
             payment = Payment.objects.get(checkout_request_id=checkout_request_id)
-            logger.debug(f"Found payment in DB: {payment.__dict__}")
         except Payment.DoesNotExist:
             payment = None
 
-        #  If DB already has a completed payment
+        # If we already have a successful payment, return instantly
         if payment and payment.result_code == 0:
-            txn_details = {
-                "TransactionID": payment.transaction_id,
-                "Amount": str(payment.amount),
-                "PhoneNumber": payment.user_phone_number,
-                "TransactionDate": payment.transaction_date.strftime("%Y-%m-%d %H:%M:%S") if payment.transaction_date else "N/A"
-            }
-            return JsonResponse({
-                'status': 'success',
-                'result_code': payment.result_code,
-                'result_desc': payment.result_desc,
-                'user_message': "Payment was successful.",
-                'transaction_details': txn_details
-            })
-
-        # If DB says failed
-        if payment and payment.result_code != 0:
             txn_details = {
                 "TransactionID": payment.transaction_id or "N/A",
                 "Amount": str(payment.amount) if payment.amount else "N/A",
@@ -55,31 +35,39 @@ def run_query(request):
                 "TransactionDate": payment.transaction_date.strftime("%Y-%m-%d %H:%M:%S") if payment.transaction_date else "N/A"
             }
             return JsonResponse({
-                'status': 'failed',
-                'result_code': payment.result_code,
+                'status': 'success',
+                'result_code': str(payment.result_code),
                 'result_desc': payment.result_desc,
-                'user_message': "Payment failed or was cancelled.",
+                'user_message': "Payment was successful.",
                 'transaction_details': txn_details
             })
 
-        # If payment is not in DB → Query Safaricom
-        logger.info("Payment not in DB — calling Safaricom...")
-
+        # Otherwise, call Safaricom to check latest status
         access_token_response = find_acesstoken(request)
+        if not isinstance(access_token_response, JsonResponse):
+            return JsonResponse({'status': 'error', 'message': 'Failed to retrieve access token.'}, status=500)
+
         access_token_data = json.loads(access_token_response.content.decode('utf-8'))
         access_token = access_token_data.get('access_token')
+
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'Access token missing from response.'}, status=500)
 
-        # Prepare password
         business_short_code = '174379'
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         passkey = os.environ.get("PASSKEY")
+
+        if not passkey:
+            return JsonResponse({'status': 'error', 'message': 'PASSKEY not set in environment variables.'}, status=500)
+
         password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
 
-        # Send query to Safaricom
         query_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
-        headers = {'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'}
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+
         payload = {
             'BusinessShortCode': business_short_code,
             'Password': password,
@@ -94,6 +82,7 @@ def run_query(request):
         result_code = str(response_data.get('ResultCode', ''))
         result_desc = response_data.get('ResultDesc', 'No description provided.')
 
+
         user_friendly_messages = {
             '0': "Payment was successful.",
             '1': "Insufficient balance in the M-PESA account.",
@@ -107,15 +96,18 @@ def run_query(request):
         }
         user_message = user_friendly_messages.get(result_code, f"Unexpected Result Code: {result_code}")
 
+        # Use DB values if present
         txn_details = {
-            "TransactionID": "N/A",
-            "Amount": "N/A",
-            "PhoneNumber": "N/A",
-            "TransactionDate": "N/A"
+            "TransactionID": payment.transaction_id if payment else "N/A",
+            "Amount": str(payment.amount) if payment and payment.amount else "N/A",
+            "PhoneNumber": payment.user_phone_number if payment else "N/A",
+            "TransactionDate": payment.transaction_date.strftime("%Y-%m-%d %H:%M:%S") if payment and payment.transaction_date else "N/A"
         }
 
+        status_label = 'success' if result_code == '0' else 'failed'
+
         return JsonResponse({
-            'status': 'success' if result_code == '0' else 'failed',
+            'status': status_label,
             'result_code': result_code,
             'result_desc': result_desc,
             'user_message': user_message,
@@ -123,5 +115,8 @@ def run_query(request):
         })
 
     except Exception as e:
-        logger.exception("Error in run_query")
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        return JsonResponse({
+            'status': 'error',
+            'message': 'An unexpected error occurred while querying the transaction.',
+            'details': str(e)
+        }, status=500)

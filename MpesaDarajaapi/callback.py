@@ -1,33 +1,28 @@
 import json
-import logging
 from datetime import datetime
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from MpesaDarajaapi.models import Payment
-
-logger = logging.getLogger(__name__)
+from datetime import datetime
 
 @csrf_exempt
 def process_stk_callback(request):
-    logger.info("STK Callback endpoint hit")
-
     if request.method != "POST":
-        logger.warning("Invalid method used for callback")
         return HttpResponseBadRequest("Invalid request method")
 
     try:
         stk_callback_response = json.loads(request.body)
 
-        # Optional logging to file for debugging
+        # Optional logging
         try:
             with open("Mpesastkresponse.json", "a") as log:
                 json.dump(stk_callback_response, log)
                 log.write("\n")
         except Exception as e:
-            logger.error(f"Failed to log callback: {e}")
+            print("Failed to log callback:", e)
 
         stk_callback = stk_callback_response.get("Body", {}).get("stkCallback", {})
-        logger.info(f"Received Callback: {json.dumps(stk_callback, indent=2)}")
+        print("Received Callback:", json.dumps(stk_callback, indent=2))
 
         merchant_request_id = stk_callback.get("MerchantRequestID")
         checkout_request_id = stk_callback.get("CheckoutRequestID")
@@ -39,7 +34,6 @@ def process_stk_callback(request):
         user_phone_number = None
         transaction_date = None
 
-        # If payment was successful, extract metadata
         if result_code == 0 and "CallbackMetadata" in stk_callback:
             metadata = stk_callback["CallbackMetadata"].get("Item", [])
 
@@ -53,16 +47,18 @@ def process_stk_callback(request):
             transaction_id = get_metadata_value("MpesaReceiptNumber")
             user_phone_number = get_metadata_value("PhoneNumber")
 
-            # Convert TransactionDate to datetime
-            raw_date = get_metadata_value("TransactionDate")
-            if raw_date:
-                try:
-                    transaction_date = datetime.strptime(str(raw_date), "%Y%m%d%H%M%S")
-                except ValueError:
-                    logger.warning(f"⚠ Invalid transaction date format: {raw_date}")
-                    transaction_date = None
+            # Parse TransactionDate to Python datetime
+            raw_transaction_date = get_metadata_value("TransactionDate")
 
-        # Save payment to DB
+        if raw_transaction_date:
+            try:
+                parsed_transaction_date = datetime.strptime(str(raw_transaction_date), "%Y%m%d%H%M%S")
+            except ValueError:
+                parsed_transaction_date = None
+        else:
+            parsed_transaction_date = None
+
+        # Save payment in DB
         Payment.objects.update_or_create(
             checkout_request_id=checkout_request_id,
             defaults={
@@ -72,11 +68,9 @@ def process_stk_callback(request):
                 "amount": amount,
                 "transaction_id": transaction_id,
                 "user_phone_number": user_phone_number,
-                "transaction_date": transaction_date
+                "transaction_date": parsed_transaction_date 
             }
         )
-
-        logger.info(f"Payment record updated for {checkout_request_id}")
 
         return JsonResponse({
             "message": "Payment saved successfully" if result_code == 0 else "Payment failed",
@@ -88,8 +82,6 @@ def process_stk_callback(request):
         })
 
     except json.JSONDecodeError:
-        logger.error("Invalid JSON format in callback")
         return HttpResponseBadRequest("Invalid JSON format")
     except Exception as e:
-        logger.exception("Unexpected error processing callback")
         return JsonResponse({"error": f"Unexpected server error: {str(e)}"}, status=500)

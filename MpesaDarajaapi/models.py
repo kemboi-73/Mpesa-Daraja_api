@@ -10,8 +10,10 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)  # MpesaReceiptNumber
     user_phone_number = models.CharField(max_length=20, blank=True, null=True)
-    transaction_date = models.CharField(max_length=20, blank=True, null=True)  # YYYYMMDDHHMMSS
+    transaction_date = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+
 
     def __str__(self):
         return f"{self.transaction_id or 'Pending'} - {self.amount}"
