@@ -21,24 +21,25 @@ from django.http import JsonResponse
 import json
 from .models import Transaction
 
-@csrf_exempt
-def mpesa_callback(request):
-    data = json.loads(request.body)
-    stk_callback = data['Body']['stkCallback']
-    checkout_request_id = stk_callback['CheckoutRequestID']
-    result_code = stk_callback['ResultCode']
-    result_desc = stk_callback['ResultDesc']
+# @csrf_exempt
+# def mpesa_callback(request):
+#     data = json.loads(request.body)
+#     stk_callback = data['Body']['stkCallback']
+#     checkout_request_id = stk_callback['CheckoutRequestID']
+#     result_code = stk_callback['ResultCode']
+#     result_desc = stk_callback['ResultDesc']
 
-    transaction = Transaction.objects.filter(checkout_request_id=checkout_request_id).first()
-    if transaction:
-        transaction.status = "Success" if result_code == 0 else f"Failed: {result_desc}"
-        transaction.save()
+#     transaction = Transaction.objects.filter(checkout_request_id=checkout_request_id).first()
+#     if transaction:
+#         transaction.status = "Success" if result_code == 0 else f"Failed: {result_desc}"
+#         transaction.save()
 
-    return JsonResponse({"status": "ok"})
+#     return JsonResponse({"status": "ok"})
 
 
 def transaction_list(request):
-    transactions = Payment.objects.all().order_by('-timestamp')
+    transactions = Payment.objects.all().order_by('-created_at')
+
     return render(request, 'transactions.html', {'transactions': transactions})
 
 from django.http import JsonResponse

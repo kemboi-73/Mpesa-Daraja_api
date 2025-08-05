@@ -1,7 +1,8 @@
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from MpesaDarajaapi.models import Payment 
+from MpesaDarajaapi.models import Payment
+from datetime import datetime
 
 @csrf_exempt
 def process_stk_callback(request):
@@ -11,7 +12,6 @@ def process_stk_callback(request):
     try:
         stk_callback_response = json.loads(request.body)
 
-        # Optional logging
         try:
             with open("Mpesastkresponse.json", "a") as log:
                 json.dump(stk_callback_response, log)
@@ -20,54 +20,58 @@ def process_stk_callback(request):
             print("Failed to log callback:", e)
 
         stk_callback = stk_callback_response.get("Body", {}).get("stkCallback", {})
+        print("Received Callback:", json.dumps(stk_callback, indent=2))
 
         merchant_request_id = stk_callback.get("MerchantRequestID")
         checkout_request_id = stk_callback.get("CheckoutRequestID")
         result_code = stk_callback.get("ResultCode")
         result_desc = stk_callback.get("ResultDesc")
 
-        if result_code == 0 and "CallbackMetadata" in stk_callback:
-            metadata = stk_callback["CallbackMetadata"].get("Item", [])
+        # Default None values
+        amount = None
+        transaction_id = None
+        user_phone_number = None
+        transaction_date = None
 
-            # Extracts values safely from metadata
-            def get_metadata_value(name):
-                for item in metadata:
-                    if item.get("Name") == name:
-                        return item.get("Value")
-                return None
+        # Extract metadata if present
+        metadata = stk_callback.get("CallbackMetadata", {}).get("Item", [])
+        for item in metadata:
+            name = item.get("Name")
+            value = item.get("Value")
+            if name == "Amount":
+                amount = value
+            elif name == "MpesaReceiptNumber":
+                transaction_id = value
+            elif name == "PhoneNumber":
+                user_phone_number = value
+            elif name == "TransactionDate":
+                try:
+                    transaction_date = datetime.strptime(str(value), "%Y%m%d%H%M%S")
+                except Exception:
+                    transaction_date = None
 
-            amount = get_metadata_value("Amount")
-            transaction_id = get_metadata_value("MpesaReceiptNumber")
-            user_phone_number = get_metadata_value("PhoneNumber")
-
-            Payment.objects.create(
-                merchant_request_id=merchant_request_id,
-                checkout_request_id=checkout_request_id,
-                result_code=result_code,
-                result_desc=result_desc,
-                amount=amount,
-                transaction_id=transaction_id,
-                user_phone_number=user_phone_number
-            )
-            return JsonResponse({
-                "message": "Payment saved successfully",
-                "transaction_id": transaction_id,
-                "amount": amount,
-                "phone": user_phone_number,
-                "result_desc": result_desc
-            })
-
-        # If payment failed
-        Payment.objects.create(
-            merchant_request_id=merchant_request_id,
+        # Save or update payment
+        Payment.objects.update_or_create(
             checkout_request_id=checkout_request_id,
-            result_code=result_code,
-            result_desc=result_desc
+            defaults={
+                "merchant_request_id": merchant_request_id,
+                "result_code": result_code,
+                "result_desc": result_desc,
+                "amount": amount,
+                "transaction_id": transaction_id,
+                "user_phone_number": user_phone_number,
+                "transaction_date": transaction_date
+            }
         )
+
         return JsonResponse({
-            "message": "Payment failed",
+            "message": "Payment record saved",
             "result_code": result_code,
-            "result_desc": result_desc
+            "result_desc": result_desc,
+            "transaction_id": transaction_id,
+            "amount": amount,
+            "phone": user_phone_number,
+            "transaction_date": transaction_date.strftime("%Y-%m-%d %H:%M:%S") if transaction_date else None
         })
 
     except json.JSONDecodeError:

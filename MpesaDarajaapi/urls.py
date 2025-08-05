@@ -13,8 +13,11 @@ urlpatterns = [
     # path('payments/', payment_list, name='payment_list'), #redirect the list to the template you want
     path('', stk_form_view, name='stk_form'),
     path('payment-success/', views.latest_payment, name='payment-success'),
-    path("api/v1/stk/callback/", process_stk_callback, name="stk_callback"),
+    # path("api/v1/stk/callback/", process_stk_callback, name="stk_callback"),
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('api/latest-payment/', views.get_latest_payment, name='get_latest_payment'),
+    # path("mpesa/callback/", process_stk_callback, name="mpesa_callback"),
+    path('get-latest-payment/', views.latest_payment, name='latest_payment'),
+    path("api/v1/stk/callback/", process_stk_callback, name="stk_callback"),
 
 ]
