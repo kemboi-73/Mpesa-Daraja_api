@@ -8,7 +8,6 @@ import base64
 import os
 import logging
 from datetime import datetime
-import time
 
 logger = logging.getLogger(__name__)
 
@@ -24,18 +23,15 @@ def run_query(request):
         if not checkout_request_id:
             return JsonResponse({'status': 'error', 'message': 'CheckoutRequestID is required.'}, status=400)
 
-        # Wait for callback to save the payment first
+        # Try to get saved payment first
         payment = None
-        for _ in range(10):  # retry for 10 seconds
-            try:
-                payment = Payment.objects.get(checkout_request_id=checkout_request_id)
-                if payment.transaction_id:  # Found payment with real data
-                    break
-            except Payment.DoesNotExist:
-                pass
-            time.sleep(1)  # wait before retry
+        try:
+            payment = Payment.objects.get(checkout_request_id=checkout_request_id)
+            print("DEBUG: Found Payment in DB:", payment.__dict__)
+        except Payment.DoesNotExist:
+            print("DEBUG: No Payment found in DB for CheckoutRequestID:", checkout_request_id)
 
-        # Get access token (for extra query verification)
+        # Get access token
         access_token_response = find_acesstoken(request)
         if not isinstance(access_token_response, JsonResponse):
             return JsonResponse({'status': 'error', 'message': 'Failed to retrieve access token.'}, status=500)
@@ -56,7 +52,7 @@ def run_query(request):
 
         password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
 
-        # Send query to Safaricom (optional extra verification)
+        # Send query to Safaricom
         query_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
         headers = {
             'Authorization': f'Bearer {access_token}',
@@ -70,7 +66,11 @@ def run_query(request):
             'CheckoutRequestID': checkout_request_id
         }
 
+        print("DEBUG: Sending payload to Safaricom:", payload)
         response = requests.post(query_url, headers=headers, json=payload)
+        print("DEBUG: Safaricom response status:", response.status_code)
+        print("DEBUG: Safaricom response body:", response.text)
+
         response.raise_for_status()
         response_data = response.json()
 
@@ -92,15 +92,21 @@ def run_query(request):
 
         user_message = user_friendly_messages.get(result_code, f"Unexpected Result Code: {result_code}")
 
-        # Build response from DB
+        # Use saved DB details if available
         txn_details = {
-            "TransactionID": payment.transaction_id if payment else "N/A",
-            "Amount": str(payment.amount) if payment else "N/A",
-            "PhoneNumber": payment.user_phone_number if payment else "N/A",
-            "TransactionDate": payment.transaction_date.strftime("%Y-%m-%d %H:%M:%S") if payment and payment.transaction_date else "N/A"
+            "TransactionID": payment.transaction_id if payment and payment.transaction_id else "N/A",
+            "Amount": str(payment.amount) if payment and payment.amount is not None else "N/A",
+            "PhoneNumber": payment.user_phone_number if payment and payment.user_phone_number else "N/A",
+            "TransactionDate": (
+                payment.transaction_date.strftime("%Y-%m-%d %H:%M:%S")
+                if payment and payment.transaction_date
+                else "N/A"
+            )
         }
 
-        if result_code == '0' and payment and payment.transaction_id:
+        print("DEBUG: Returning txn_details:", txn_details)
+
+        if result_code == '0':
             return JsonResponse({
                 'status': 'success',
                 'result_code': result_code,
@@ -117,20 +123,9 @@ def run_query(request):
             'transaction_details': txn_details
         })
 
-    except requests.exceptions.RequestException as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'A network error occurred while querying the transaction.',
-            'details': str(e)
-        }, status=500)
-
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Invalid JSON response received from Safaricom.'
-        }, status=500)
-
     except Exception as e:
+        import traceback
+        print("ERROR TRACEBACK:\n", traceback.format_exc())
         return JsonResponse({
             'status': 'error',
             'message': 'An unexpected error occurred while querying the transaction.',
