@@ -1,4 +1,6 @@
-/* General body styles */
+/* =====================
+   Layout Base
+===================== */
 html, body {
   height: 100%;
 }
@@ -10,7 +12,7 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* ensures full height for footer push */
+  min-height: 100vh; /* ensures footer push */
 }
 
 main {
@@ -19,7 +21,9 @@ main {
   flex-direction: column;
 }
 
-/* Generic container for forms */
+/* =====================
+   Containers
+===================== */
 .container {
   background: white;
   padding: 30px;
@@ -31,7 +35,6 @@ main {
   width: 90%;
 }
 
-/* Transactions page container */
 .transactions-container {
   background: white;
   padding: 20px;
@@ -42,6 +45,9 @@ main {
   width: 95%;
 }
 
+/* =====================
+   Logo
+===================== */
 .logo {
   display: flex;
   justify-content: center;
@@ -54,6 +60,9 @@ main {
   height: auto;
 }
 
+/* =====================
+   Form Fields
+===================== */
 label {
   font-weight: bold;
 }
@@ -66,7 +75,6 @@ input[type="text"], input[type="number"] {
   border-radius: 5px;
 }
 
-/* Button styling */
 input[type="submit"] {
   width: 100%;
   padding: 10px;
@@ -82,7 +90,9 @@ input[type="submit"]:hover {
   background: #219150;
 }
 
-/* Status messages */
+/* =====================
+   Status Messages
+===================== */
 #status {
   display: none;
   margin-top: 20px;
@@ -103,7 +113,9 @@ input[type="submit"]:hover {
   border: 1px solid #e74c3c;
 }
 
-/* Modal styling */
+/* =====================
+   Modal
+===================== */
 .modal {
   display: none;
   position: fixed;
@@ -139,12 +151,13 @@ input[type="submit"]:hover {
   color: #000;
 }
 
-/* Table responsiveness */
+/* =====================
+   Tables
+===================== */
 .table-responsive {
   overflow-x: auto;
 }
 
-/* Desktop styles */
 @media (min-width: 992px) {
   .table-responsive {
     overflow-x: visible;
@@ -166,18 +179,64 @@ input[type="submit"]:hover {
     background-color: #2c3e50;
     color: white;
   }
-} /* ✅ closed */
+}
 
-/* Mobile: allow wrapping */
 @media (max-width: 991px) {
   table th, table td {
     white-space: nowrap;
   }
 }
 
-/* Small screen adjustments */
+/* =====================
+   Footer
+===================== */
+.simple-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #f7f7f7;
+  font-size: 14px;
+  border-top: 1px solid #ddd;
+}
+
+.simple-footer .footer-left {
+  color: #555;
+}
+
+.simple-footer .footer-right {
+  display: flex;
+  gap: 10px;
+}
+
+.simple-footer .footer-icon {
+  font-size: 20px;
+  color: #2c3e50 !important; /* keep color same */
+  text-decoration: none;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.simple-footer .footer-icon:hover {
+  transform: translateY(-2px);
+  color: #011f0d !important;
+}
+
+.kemboi-link {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.kemboi-link:hover {
+  text-decoration: underline;
+  color: #011f0d;
+}
+
+/* =====================
+   Mobile Adjustments
+===================== */
 @media (max-width: 768px) {
-  /* Container & form */
+  /* Container */
   .container {
     max-width: 100%;
     margin-top: 15px;
@@ -203,7 +262,7 @@ input[type="submit"]:hover {
     font-size: 14px;
   }
 
-  /* Footer adjustments */
+  /* Footer */
   .simple-footer {
     flex-direction: column;
     align-items: center;
@@ -232,53 +291,13 @@ input[type="submit"]:hover {
   .container {
     padding: 10px;
   }
+
   .footer-icon {
     font-size: 20px;
   }
+
   table th, table td {
     font-size: 12px;
     padding: 6px;
   }
-}
-
-/* Footer styling */
-.simple-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background: #f7f7f7;
-  font-size: 14px;
-  border-top: 1px solid #ddd;
-}
-
-.simple-footer .footer-left {
-  color: #555;
-}
-
-.simple-footer .footer-right {
-  display: flex;
-  gap: 10px;
-}
-
-.simple-footer .footer-icon {
-  font-size: 20px;
-  color: #2c3e50;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.simple-footer .footer-icon:hover {
-  transform: translateY(-2px);
-  color: #011f0d;
-}
-
-.kemboi-link {
-  color: #2c3e50;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.kemboi-link:hover {
-  text-decoration: underline;
-  color: #011f0d;
 }
