@@ -1,7 +1,7 @@
 from pathlib import Path
 from decouple import config
 import os
-
+import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -79,6 +79,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+DATABASES["default"] = dj_database_url.parse("postgresql://mpesa_kpyu_user:w5gUmp7jCxYyCy6pglxOoQYwvn9cOAei@dpg-d29ou115pdvs73eola30-a.oregon-postgres.render.com/mpesa_kpyu")
 
 
 # Password validation
