@@ -7,69 +7,70 @@
   <script src="https://kit.fontawesome.com/fff031d665.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="icon" type="image/png" href="{% static 'banner.svg' %}">
-
   <title>MPESA STK Push Payment</title>
 </head>
 <body>
   <main>
-  <div class="container">
-    <div class="logo">
-      <img src="{% static 'lipa na mpesa.png' %}" alt="Lipa na Mpesa">
-    </div>
+    <div class="container">
+      <div class="logo">
+        <img src="{% static 'lipa na mpesa.png' %}" alt="Lipa na Mpesa">
+      </div>
 
-    <form onsubmit="initiatePayment(event)">
-      <label for="phone">Phone Number</label>
-      <input type="text" id="phone" name="phone" placeholder="e.g. 254712345678" required>
+      <form onsubmit="initiatePayment(event)">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone" placeholder="e.g. 254712345678 or 0712345678" required>
 
-      <label for="amount">Amount (KES)</label>
-      <input type="number" id="amount" name="amount" min="1" required>
+        <label for="amount">Amount (KES)</label>
+        <input type="number" id="amount" name="amount" min="1" required>
 
-      <input type="submit" value="Pay Now">
+        <input type="submit" value="Pay Now">
 
-      <p style="color: rgb(104, 6, 223); font-size: 0.9em; margin-top: 10px;">
-        * This is a <strong>test environment</strong>. All transactions will be 
-        <strong>auto-reversed</strong> shortly by M-PESA.
-      </p>
-    </form>
+        <p style="color: rgb(104, 6, 223); font-size: 0.9em; margin-top: 10px;">
+          * This is a <strong>test environment</strong>. All transactions will be 
+          <strong>auto-reversed</strong> shortly by M-PESA.
+        </p>
+      </form>
 
-    <!-- Modal -->
-    <div id="paymentModal" class="modal"
-         data-success-url="{% static 'success.gif' %}"
-         data-failed-url="{% static 'failed.gif' %}">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img id="modalGif" src="" alt="Status Animation" style="width: 80px; margin-bottom: 10px;">
-        <h2 id="modalTitle"></h2>
-        <p id="modalMessage"></p>
-        <button id="doneBtn" 
-        style="margin-top: 15px; padding: 10px 20px; background: #28a745; 
-               color: white; border: none; border-radius: 5px; cursor: pointer;">
-          Done
-        </button>
+      <!-- Modal -->
+      <div id="paymentModal" class="modal"
+           data-success-url="{% static 'success.gif' %}"
+           data-failed-url="{% static 'failed.gif' %}">
+        <div class="modal-content">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <img id="modalGif" src="" alt="Status Animation" style="width: 80px; margin-bottom: 10px;">
+          <h2 id="modalTitle"></h2>
+          <p id="modalMessage"></p>
+          <button id="doneBtn" 
+            style="margin-top: 15px; padding: 10px 20px; background: #28a745; 
+                   color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Done
+          </button>
+        </div>
+      </div>
+
+      <div id="status"></div>
+      <div id="spinner" style="display: none; text-align: center; margin-top: 20px;">
+        <img src="{% static 'spinner.svg' %}" alt="Loading..." style="width: 50px;">
       </div>
     </div>
+  </main>
 
-    <div id="status"></div>
-    <div id="spinner" style="display: none; text-align: center; margin-top: 20px;">
-      <img src="{% static 'spinner.svg' %}" alt="Loading..." style="width: 50px;">
+ 
+  <footer class="simple-footer">
+    <div class="footer-left">
+      © 2025 <a href="https://kemboi.dev" class="kemboi-link">Kemboi</a>. 
+      <span class="docs-note">Documentation coming soon</span>.
     </div>
-  </div>
-  
-</main>
-<!-- <footer class="simple-footer">
-  <div class="footer-left">
-    © 2025 <a href="https://kemboi.dev" class="kemboi-link">Kemboi</a>. 
-    <span class="docs-note">Documentation coming soon</span>.
-  </div>
 
-  <div class="footer-right">
-    <a href="https://x.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-x-twitter"></i></a>
-    <a href="https://github.com/kemboi-73" class="footer-icon"><i class="fa-brands fa-square-github"></i></a>
-    <a href="https://www.linkedin.com/in/kemboimikey" class="footer-icon"><i class="fa-brands fa-linkedin"></i></a>
-    <a href="https://www.instagram.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-instagram"></i></a>
-    <a href="https://api.whatsapp.com/send?phone=+254721601159" class="footer-icon"><i class="fa-brands fa-square-whatsapp"></i></a>
-  </div>
-</footer> -->
+    <div class="footer-right">
+      <a href="https://x.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-x-twitter"></i></a>
+      <a href="https://github.com/kemboi-73" class="footer-icon"><i class="fa-brands fa-square-github"></i></a>
+      <a href="https://www.linkedin.com/in/kemboimikey" class="footer-icon"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://www.instagram.com/mykey611" class="footer-icon"><i class="fa-brands fa-square-instagram"></i></a>
+      <a href="https://api.whatsapp.com/send?phone=+254721601159" class="footer-icon"><i class="fa-brands fa-square-whatsapp"></i></a>
+    </div>
+  </footer>
+
   <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

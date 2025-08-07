@@ -3,23 +3,19 @@
 ===================== */
 html, body {
   height: 100%;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: #f7f7f7;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* ensures footer push */
+  overflow-x: hidden;
 }
 
 main {
-  flex: 1; /* pushes footer to bottom */
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
+
 
 /* =====================
    Containers
@@ -236,11 +232,10 @@ input[type="submit"]:hover {
    Mobile Adjustments
 ===================== */
 @media (max-width: 768px) {
-  /* Container */
   .container {
     max-width: 100%;
-    margin-top: 15px;
-    padding: 12px;
+    margin: 10px auto;
+    padding: 16px;
   }
 
   .logo img {
@@ -253,22 +248,21 @@ input[type="submit"]:hover {
   }
 
   input[type="text"], input[type="number"] {
-    padding: 8px;
-    font-size: 14px;
+    padding: 10px;
+    font-size: 15px;
   }
 
   input[type="submit"] {
-    padding: 8px;
-    font-size: 14px;
+    padding: 10px;
+    font-size: 15px;
   }
 
-  /* Footer */
   .simple-footer {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 8px;
-    padding: 15px;
+    gap: 10px;
+    padding: 20px 10px;
   }
 
   .simple-footer .footer-right {
@@ -284,20 +278,5 @@ input[type="submit"]:hover {
   table th, table td {
     font-size: 14px;
     padding: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  .footer-icon {
-    font-size: 20px;
-  }
-
-  table th, table td {
-    font-size: 12px;
-    padding: 6px;
   }
 }
