@@ -27,7 +27,7 @@ def start(request):
                 process_request_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
                 callback_url = os.environ.get("CALLBACK_URL")
                 passkey = os.environ.get("PASSKEY")
-                business_short_code = '174379'
+                business_short_code = os.environ.get("BUSINESS_SHORT_CODE")
                 timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
                 password = base64.b64encode((business_short_code + passkey + timestamp).encode()).decode()
 

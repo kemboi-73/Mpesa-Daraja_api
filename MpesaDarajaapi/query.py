@@ -86,8 +86,8 @@ def run_query(request):
         user_friendly_messages = {
             '0': "Payment was successful.",
             '1': "Insufficient balance in the M-PESA account.",
-            '1032': "You cancelled the transaction.",
-            '1037': "Timeout – You did not respond to the M-PESA prompt.",
+            '1032': "Transaction was cancelled.",
+            '1037': "Timeout – User did not respond to the M-PESA prompt.",
             '2001': "Incorrect M-PESA PIN entered.",
             '1001': "Transaction is still in progress.",
             '9999': "An unknown error occurred.",
